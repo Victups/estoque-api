@@ -15,14 +15,31 @@ import { MarcasModule } from './marcas/marcas.module';
 import { UnidadesModule } from './unidades/unidades.module';
 import { DatabaseModule } from './database/database.module';
 import { DepositosModule } from './depositos/depositos.module';
-import { EnderecosController } from './enderecos/enderecos.controller';
-import { ContatosController } from './contatos/contatos.controller';
 import { ProdutoFornecedorModule } from './produto-fornecedor/produto-fornecedor.module';
 import { EnderecosModule } from './enderecos/enderecos.module';
+import { ContatosModule } from './contatos/contatos.module';
 
 @Module({
-  imports: [ProdutosModule, FornecedoresModule, CategoriasModule, AuthModule, UsuariosModule, DashboardsModule, LocaisModule, EstoquesModule, MovimentacoesModule, LotesModule, MarcasModule, UnidadesModule, DatabaseModule, DepositosModule, ProdutoFornecedorModule, EnderecosModule],
-  controllers: [AppController, EnderecosController, ContatosController],
+  imports: [
+    ProdutosModule,
+    FornecedoresModule,
+    CategoriasModule,
+    AuthModule,
+    UsuariosModule,
+    DashboardsModule,
+    LocaisModule,
+    EstoquesModule,
+    MovimentacoesModule,
+    LotesModule,
+    MarcasModule,
+    UnidadesModule,
+    DatabaseModule,
+    DepositosModule,
+    ProdutoFornecedorModule,
+    EnderecosModule,
+    ContatosModule
+  ],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

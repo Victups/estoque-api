@@ -10,7 +10,7 @@ export const dataSourceOptions: DataSourceOptions = {
   password: 'admin',
   database: 'produto',
   synchronize: true,
-  // registra automaticamente todas as entities em src/**/entities/*.entity.ts ou .js
+
   entities: [__dirname + '/../**/entities/*.entities{.ts,.js}'],
 };
 

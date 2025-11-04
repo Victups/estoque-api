@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateFornecedoreDto } from './dto/create-fornecedore.dto';
 import { UpdateFornecedoreDto } from './dto/update-fornecedore.dto';
+import { Fornecedore } from './entities/fornecedore.entity';
 
 @Injectable()
 export class FornecedoresService {
+  constructor(
+    @InjectRepository(Fornecedore)
+    private readonly repo: Repository<Fornecedore>,
+  ) {}
+
   create(createFornecedoreDto: CreateFornecedoreDto) {
     return 'This action adds a new fornecedore';
   }

@@ -1,26 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Auth } from './entities/auth.entity';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @InjectRepository(Auth)
+    private readonly repo: Repository<Auth>,
+  ) {}
+
+  async create(createAuthDto: CreateAuthDto): Promise<Auth> {
+    const auth = this.repo.create(createAuthDto);
+    return this.repo.save(auth);
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async findAll(): Promise<Auth[]> {
+    return this.repo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async findOne(id: number): Promise<Auth> {
+    const auth = await this.repo.findOne({ where: { id } });
+    if (!auth) {
+      throw new NotFoundException(`Auth with ID ${id} not found`);
+    }
+    return auth;
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  async update(id: number, updateAuthDto: UpdateAuthDto): Promise<Auth> {
+    const auth = await this.repo.preload({
+      id: id,
+      ...updateAuthDto,
+    });
+    if (!auth) {
+      throw new NotFoundException(`Auth with ID ${id} not found`);
+    }
+    return this.repo.save(auth);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async remove(id: number): Promise<void> {
+    const auth = await this.findOne(id);
+    await this.repo.remove(auth);
   }
 }
