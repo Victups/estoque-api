@@ -1,15 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { ProdutosService } from './produtos.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+type AuthenticatedRequest = Request & {
+  user: {
+    userId: number;
+    email: string;
+    role: string;
+  };
+};
+
+@UseGuards(JwtAuthGuard)
 @Controller('produtos')
 export class ProdutosController {
   constructor(private readonly produtosService: ProdutosService) {}
 
   @Post()
-  create(@Body() createProdutoDto: CreateProdutoDto) {
-    return this.produtosService.create(createProdutoDto);
+  create(@Body() createProdutoDto: CreateProdutoDto, @Req() req: AuthenticatedRequest) {
+    return this.produtosService.create(createProdutoDto, req.user?.userId);
   }
 
   @Get()
@@ -23,12 +34,12 @@ export class ProdutosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto) {
-    return this.produtosService.update(+id, updateProdutoDto);
+  update(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto, @Req() req: AuthenticatedRequest) {
+    return this.produtosService.update(+id, updateProdutoDto, req.user?.userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.produtosService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    return this.produtosService.remove(+id, req.user?.userId);
   }
 }

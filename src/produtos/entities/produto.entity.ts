@@ -52,7 +52,7 @@ export class Produto {
 	@OneToMany(() => ProdutoFornecedor, (pf) => pf.produto, { cascade: false })
 	fornecedores: ProdutoFornecedor[];
 
-	@Column('numeric', { precision: 10, scale: 2, default: 10 })
+	@Column('numeric', { name: 'estoque_minimo', precision: 10, scale: 2, default: 10 })
 	estoqueMinimo: number;
 
 	@Column({ name: 'is_perecivel', default: false })
