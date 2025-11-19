@@ -1,47 +1,73 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { Auth } from './entities/auth.entity';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { LoginDto } from './dto/login.dto';
+import { Usuario } from '../usuarios/entities/usuario.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Auth)
-    private readonly repo: Repository<Auth>,
+    @InjectRepository(Usuario)
+    private readonly usuariosRepo: Repository<Usuario>,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async create(createAuthDto: CreateAuthDto): Promise<Auth> {
-    const auth = this.repo.create(createAuthDto);
-    return this.repo.save(auth);
-  }
-
-  async findAll(): Promise<Auth[]> {
-    return this.repo.find();
-  }
-
-  async findOne(id: number): Promise<Auth> {
-    const auth = await this.repo.findOne({ where: { id } });
-    if (!auth) {
-      throw new NotFoundException(`Auth with ID ${id} not found`);
-    }
-    return auth;
-  }
-
-  async update(id: number, updateAuthDto: UpdateAuthDto): Promise<Auth> {
-    const auth = await this.repo.preload({
-      id: id,
-      ...updateAuthDto,
+  async validateUser(email: string, senha: string): Promise<Usuario> {
+    const usuario = await this.usuariosRepo.findOne({
+      where: { email },
+      relations: ['contato'],
     });
-    if (!auth) {
-      throw new NotFoundException(`Auth with ID ${id} not found`);
+
+    if (!usuario) {
+      throw new UnauthorizedException('Credenciais inválidas');
     }
-    return this.repo.save(auth);
+
+    if (!usuario.senha) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    if (!usuario.senha.startsWith('$2')) {
+      if (usuario.senha !== senha) {
+        throw new UnauthorizedException('Credenciais inválidas');
+      }
+      const hashed = await bcrypt.hash(
+        senha,
+        Number(process.env.BCRYPT_SALT_ROUNDS ?? 10),
+      );
+      await this.usuariosRepo.update({ id: usuario.id }, { senha: hashed });
+      usuario.senha = hashed;
+    } else {
+      const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+      if (!senhaCorreta) {
+        throw new UnauthorizedException('Credenciais inválidas');
+      }
+    }
+
+    return usuario;
   }
 
-  async remove(id: number): Promise<void> {
-    const auth = await this.findOne(id);
-    await this.repo.remove(auth);
+  async login({ email, senha }: LoginDto) {
+    const usuario = await this.validateUser(email.toLowerCase(), senha);
+
+    const payload = {
+      sub: usuario.id,
+      email: usuario.email,
+      role: usuario.role,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      access_token: accessToken,
+      user: {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        role: usuario.role,
+      },
+    };
   }
+
 }

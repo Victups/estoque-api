@@ -14,10 +14,13 @@ import { LotesModule } from './lotes/lotes.module';
 import { MarcasModule } from './marcas/marcas.module';
 import { UnidadesModule } from './unidades/unidades.module';
 import { DatabaseModule } from './database/database.module';
+import { UfModule } from './uf/uf.module';
+import { MunicipiosModule } from './municipios/municipios.module';
 import { DepositosModule } from './depositos/depositos.module';
 import { ProdutoFornecedorModule } from './produto-fornecedor/produto-fornecedor.module';
 import { EnderecosModule } from './enderecos/enderecos.module';
 import { ContatosModule } from './contatos/contatos.module';
+import { AuditoriaModule } from './auditoria/auditoria.module';
 
 @Module({
   imports: [
@@ -34,10 +37,13 @@ import { ContatosModule } from './contatos/contatos.module';
     MarcasModule,
     UnidadesModule,
     DatabaseModule,
+    UfModule,
+    MunicipiosModule,
     DepositosModule,
     ProdutoFornecedorModule,
     EnderecosModule,
-    ContatosModule
+    ContatosModule,
+    AuditoriaModule
   ],
   controllers: [AppController],
   providers: [AppService],
