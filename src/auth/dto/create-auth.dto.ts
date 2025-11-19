@@ -11,7 +11,7 @@ export class CreateAuthDto {
 	@MaxLength(255)
 	senha: string;
 
-	// campo opcional caso a API permita passar nome ao criar auth
+
 	@IsString()
 	@IsOptional()
 	@MaxLength(100)
