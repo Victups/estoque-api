@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Deposito } from '../../depositos/entities/deposito.entity';
+import { Municipio } from '../../municipios/entities/municipio.entity';
 
 @Entity('enderecos')
 export class Endereco {
@@ -15,8 +16,8 @@ export class Endereco {
   @Column({ length: 255, nullable: true })
   complemento?: string;
 
-  @Column({ length: 20 })
-  cep: string;
+  @Column({ length: 150, nullable: true })  // NOVO
+  bairro?: string;
 
   @Column({ name: 'id_municipio', nullable: true })
   idMunicipio?: number;
@@ -26,4 +27,8 @@ export class Endereco {
 
   @OneToMany(() => Deposito, (d) => d.endereco, { cascade: false })
   depositos?: Deposito[];
+
+  @ManyToOne(() => Municipio, (municipio) => municipio.enderecos, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
+  @JoinColumn({ name: 'id_municipio' })
+  municipio?: Municipio;
 }

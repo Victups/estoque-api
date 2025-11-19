@@ -17,23 +17,26 @@ export class EnderecosService {
       logradouro: createEnderecoDto.logradouro,
       numero: createEnderecoDto.numero,
       complemento: createEnderecoDto.complemento,
-      cep: createEnderecoDto.cep,
+      bairro: createEnderecoDto.bairro?.toLowerCase().trim(),
       idMunicipio: createEnderecoDto.id_municipio,
       ativo: createEnderecoDto.ativo,
+      municipio: createEnderecoDto.id_municipio
+        ? ({ id: createEnderecoDto.id_municipio } as any)
+        : undefined,
     });
     return this.repo.save(endereco);
   }
 
   async findAll(): Promise<Endereco[]> {
     return this.repo.find({
-      relations: ['depositos'],
+      relations: ['municipio', 'municipio.uf', 'depositos'],
     });
   }
 
   async findOne(id: number): Promise<Endereco> {
     const endereco = await this.repo.findOne({
       where: { id },
-      relations: ['depositos', 'depositos.localizacoes'],
+      relations: ['municipio', 'municipio.uf', 'depositos', 'depositos.localizacoes'],
     });
     
     if (!endereco) {
@@ -49,9 +52,12 @@ export class EnderecosService {
       logradouro: updateEnderecoDto.logradouro,
       numero: updateEnderecoDto.numero,
       complemento: updateEnderecoDto.complemento,
-      cep: updateEnderecoDto.cep,
+      bairro: updateEnderecoDto.bairro?.toLowerCase().trim(),
       idMunicipio: updateEnderecoDto.id_municipio,
       ativo: updateEnderecoDto.ativo,
+      municipio: updateEnderecoDto.id_municipio
+        ? ({ id: updateEnderecoDto.id_municipio } as any)
+        : undefined,
     });
     if (!endereco) {
       throw new NotFoundException(`Endereço com id ${id} não encontrado`);
