@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateTableAuditLog1762525939937 implements MigrationInterface {
-  public async up(queryRunner: QueryRunner): Promise<void> {
+    public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE SEQUENCE IF NOT EXISTS public.auditoria_alteracoes_audit_id_seq
         AS bigint
@@ -22,8 +22,7 @@ export class CreateTableAuditLog1762525939937 implements MigrationInterface {
         dados_depois jsonb,
         usuario_id integer,
         audit_timestamp timestamptz DEFAULT now() NOT NULL,
-        CONSTRAINT auditoria_alteracoes_pkey PRIMARY KEY (audit_id),
-        CONSTRAINT auditoria_usuario_fk FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id)
+        CONSTRAINT auditoria_alteracoes_pkey PRIMARY KEY (audit_id)
       )
     `);
 
@@ -37,12 +36,12 @@ export class CreateTableAuditLog1762525939937 implements MigrationInterface {
     await queryRunner.query(`
       CREATE INDEX IF NOT EXISTS idx_auditoria_alteracoes_usuario ON public.auditoria_alteracoes (usuario_id, audit_timestamp)
     `);
-  }
+    }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
+    public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP INDEX IF EXISTS public.idx_auditoria_alteracoes_usuario`);
     await queryRunner.query(`DROP INDEX IF EXISTS public.idx_auditoria_alteracoes_tbl`);
     await queryRunner.query(`DROP TABLE IF EXISTS public.auditoria_alteracoes`);
     await queryRunner.query(`DROP SEQUENCE IF EXISTS public.auditoria_alteracoes_audit_id_seq`);
-  }
+    }
 }
